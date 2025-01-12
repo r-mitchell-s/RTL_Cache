@@ -65,32 +65,48 @@ module l1_cache #(
     // state register declaration
     logic [2:0] current_state, next_state;
 
-    // combinatorial logic for determining next state
-    case current_state
-        
-        // IDLE handling
-        IDLE:
+    // determine outputs and next state - COMBINATORIAL BLOCK
+    always_comb begin
 
-        // CHECK_TAG handling
-        CHECK_TAG:
+        // default assignmments to prevent latching
+        next_state = current_state;
+        o_cpu_data_valid = 1'b0;
+        o_mem_read_en = 1'b0;
+        o_mem_write_en = 1'b0;
+        o_mem_write_data = 1'b0;
+        o_mem_addr = i_cpu_addr;
 
-        // CHECK_DIRTY handling
-        CHECK_DIRTY:
+        // case handling
+        case current_state
+            
+            // IDLE handling - wait for a read or write from the cpu
+            IDLE:
+                // move to check tag if the cpu requests a memory action
+                if (i_cpu_read_en || i_cpu_write_en) begin
+                    next_state = 
+                end
 
-        // WRITE_BACK handling
-        WRITE_BACK:
+            // CHECK_TAG handling
+            CHECK_TAG:
 
-        // FETCH_LINE handling
-        FETCH_LINE:
+            // CHECK_DIRTY handling
+            CHECK_DIRTY:
 
-        // WRITE_DATA handling
-        WRITE_DATA:
+            // WRITE_BACK handling
+            WRITE_BACK:
 
-        // default case
-        default: next_state = IDLE;
-    endcase
+            // FETCH_LINE handling
+            FETCH_LINE:
+
+            // WRITE_DATA handling
+            WRITE_DATA:
+
+            // default case
+            default: next_state = IDLE;
+        endcase
+    end
     
-    // state transition logic - sequential block
+    // state transition logic - SEQUENTIAL BLOCK
     always @(posedge i_clk) begin
 
         // reset handling - deassert all outputs and reset to IDLE state
